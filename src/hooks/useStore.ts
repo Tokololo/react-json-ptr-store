@@ -12,9 +12,18 @@ import { Store, IStoreFlags, strictnessType } from "@tokololo/json-ptr-store";
  */
 export const useStore = (
     initial?: { [prop: string]: any },
-    flags?: IStoreFlags,
-    deps: React.DependencyList = []
-) => useMemo(() => new Store(initial, flags), [...deps]);
+    flags?: IStoreFlags
+) => {
+
+    const store = useMemo(() => new Store(initial, flags), []);
+
+    useEffect(() => {
+        return () => store?.destroy();
+    }, []);
+
+    return store;
+
+}
 
 /**
  * Hook that subscribes to the store at a json pointer value
