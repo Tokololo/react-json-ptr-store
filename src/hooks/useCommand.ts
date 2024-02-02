@@ -1,11 +1,11 @@
 import { Store } from "@tokololo/json-ptr-store";
-import { DependencyList, useContext } from "react";
+import { DependencyList } from "react";
 import { useStoreTrigger } from "./useStore";
-import { GlobalStoreContext } from "../wrappedInStore";
+import { useGlobalStore } from "../store";
 
 export const useSendCommand = (store?: Store) => {
 
-    const gStore = useContext(GlobalStoreContext);
+    const gStore = useGlobalStore();
 
     return (ptr: string, value?: any) =>
         (store || gStore).set([{ ptr: `/command${ptr}`, value: { value } }]);
@@ -19,7 +19,7 @@ export const useTriggerCommand = <T>(
     store?: Store
 ) => {
 
-    const gStore = useContext(GlobalStoreContext);
+    const gStore = useGlobalStore();
 
     useStoreTrigger<{ ptr: string, value: any }>(
         `/command${ptr}`,
