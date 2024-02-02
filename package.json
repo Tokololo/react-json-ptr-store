@@ -1,0 +1,59 @@
+{
+    "name": "@tokololo/react-json-ptr-store",
+    "version": "1.0.0",
+    "description": "A json pointer and rxjs enabled reactive store for React",
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/index.d.ts",
+    "files": [
+        "dist",
+        "LICENSE",
+        "README.md"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "yarn build:esm && yarn build:cjs",
+        "build:esm": "tsc",
+        "build:cjs": "tsc --module commonjs --outDir dist/cjs",
+        "lint": "eslint \"{**/*,*}.{js,ts,jsx,tsx}\"",
+        "prepare": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tokololo/react-json-ptr-store.git"
+    },
+    "keywords": [
+        "react",
+        "json-pointer",
+        "rxjs",
+        "store",
+        "state-management"
+    ],
+    "author": "WillowDigit",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Tokololo/react-json-ptr-store/issues"
+    },
+    "homepage": "https://github.com/Tokololo/react-json-ptr-store#readme",
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/lodash": "^4.14.202",
+        "@types/react": "^18.2.51",
+        "@typescript-eslint/eslint-plugin": "^6.20.0",
+        "@typescript-eslint/parser": "^6.20.0",
+        "eslint": "^8.56.0",
+        "eslint-plugin-react": "^7.33.2",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "@tokololo/json-ptr-store": "^1.0.9",
+        "lodash": "^4.17.21",
+        "rxjs": "^7.8.1"
+    }
+}
