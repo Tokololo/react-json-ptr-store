@@ -1,6 +1,6 @@
 {
     "name": "@tokololo/react-json-ptr-store",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A json pointer and rxjs enabled reactive store for React",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
@@ -40,6 +40,7 @@
         "react-dom": "^18.2.0"
     },
     "devDependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
         "@types/lodash": "^4.14.202",
         "@types/react": "^18.2.51",
         "@typescript-eslint/eslint-plugin": "^6.20.0",
