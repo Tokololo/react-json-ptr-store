@@ -1,37 +1,38 @@
 import { Store } from "@tokololo/json-ptr-store";
-import { DependencyList } from "react";
-import { useGlobalStore, useStoreTrigger } from "./useStore";
+import React from "react";
+import { useStoreTrigger } from "./useStore";
+import { getGlobalStore } from "../store";
 
 export const useSendCommand = (store?: Store) => {
 
-    const gStore = useGlobalStore();
+    const _store = React.useMemo(() => store || getGlobalStore(), [store]);
 
     return (ptr: string, value?: any) =>
-        (store || gStore).set([{ ptr: `/command${ptr}`, value: { value } }]);
+        _store.set([{ ptr: `/command${ptr}`, value: { value } }]);
 
 }
 
 export const useTriggerCommand = <T>(
     ptr: string,
     cb: (val: T) => void,
-    deps: DependencyList = [],
+    deps: React.DependencyList = [],
     store?: Store
 ) => {
 
-    const gStore = useGlobalStore();
+    const _store = React.useMemo(() => store || getGlobalStore(), [store]);
 
-    useStoreTrigger<{ ptr: string, value: any }>(
+    useStoreTrigger<{ value: T }>(
         `/command${ptr}`,
-        (store || gStore),
+        _store,
         res => {
             if (res) {
                 cb(res.value);
-                (store || gStore).del([`/command${ptr}`], { nextTick: true });
+                _store.del([`/command${ptr}`], { nextTick: true });
             }
         },
         'strict',
         undefined,
-        deps
+        [ptr, store, ...deps]
     );
 
 }

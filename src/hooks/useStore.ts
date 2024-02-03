@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import { Observable, of, skip as _skip, switchMap, tap } from "rxjs";
 import { useObservable } from "./useObservable";
 import { Store, IStoreFlags, strictnessType } from "@tokololo/json-ptr-store";
@@ -12,7 +12,7 @@ import { getGlobalStore } from "../store";
  * @returns The singleton global store
  */
 export const useGlobalStore = (
-    initial?: {[prop: string]: any },
+    initial?: { [prop: string]: any },
     flags?: IStoreFlags<strictnessType>,
     comparer?: <Stricktness extends string = strictnessType>(obj1: any, obj2: any, strictness: Stricktness) => boolean
 ) => getGlobalStore(initial, flags, comparer);
@@ -34,9 +34,9 @@ export const useStore = (
     flags?: IStoreFlags
 ) => {
 
-    const store = useMemo(() => new Store(initial, flags), []);
+    const store = React.useMemo(() => new Store(initial, flags), []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         return () => store?.destroy();
     }, []);
 
@@ -113,7 +113,7 @@ export const useStoreTransform = <IN = any, OUT = any>(
  */
 export const useStoreSet = (store: Store, data: { ptr: string, value: any }[], deps: React.DependencyList = []) => {
 
-    useEffect(() => {
+    React.useEffect(() => {
         store.set(data);
     }, [...deps]);
 
@@ -136,7 +136,7 @@ export const useStoreTrigger = <T>(
     skip: number = 1,
     deps: React.DependencyList | undefined = []): void => {
 
-    useEffect(() => {
+    React.useEffect(() => {
 
         const sub = store.get(ptr, strictness)
             .pipe(_skip(skip)).subscribe(cb);
