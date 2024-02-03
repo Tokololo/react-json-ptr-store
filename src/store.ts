@@ -1,6 +1,16 @@
-import { IStoreFlags, Store, strictnessType } from '@tokololo/json-ptr-store';
+import { Store } from '@tokololo/json-ptr-store';
 
 let STORE: Store | undefined;
+
+export type strictnessType = 'isEqualRemoveUndefinedSorted' | 'isEqualRemoveUndefined' | 'isEqual' | 'strict' | 'none';
+export interface IStoreFlags<Strictness extends string = strictnessType> {
+    nextTick?: boolean,
+    strictness?: Strictness
+}
+export interface IStoreFlags<Strictness extends string = strictnessType> {
+    nextTick?: boolean,
+    strictness?: Strictness
+}
 
 /**
  * Get or create the singleton global store. Parameters only take effect during initial creation.
