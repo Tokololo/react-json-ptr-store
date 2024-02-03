@@ -1,4 +1,4 @@
 export { useObservable } from './hooks/useObservable';
 export { useSendCommand, useTriggerCommand } from './hooks/useCommand';
-export { useStore, useStoreGet, useStoreSet, useStoreTransform, useStoreTrigger } from './hooks/useStore';
-export { PageStoreContext, useGlobalStore, getGlobalStore } from './store';
+export { useGlobalStore, useStore, useStoreGet, useStoreSet, useStoreTransform, useStoreTrigger, SectionStoreContext } from './hooks/useStore';
+export { getGlobalStore } from './store';

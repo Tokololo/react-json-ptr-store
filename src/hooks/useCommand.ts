@@ -1,7 +1,6 @@
 import { Store } from "@tokololo/json-ptr-store";
 import { DependencyList } from "react";
-import { useStoreTrigger } from "./useStore";
-import { useGlobalStore } from "../store";
+import { useGlobalStore, useStoreTrigger } from "./useStore";
 
 export const useSendCommand = (store?: Store) => {
 

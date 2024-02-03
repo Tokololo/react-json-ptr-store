@@ -1,10 +1,20 @@
-import React from 'react';
-import { Store } from '@tokololo/json-ptr-store';
+import { IStoreFlags, Store, strictnessType } from '@tokololo/json-ptr-store';
 
-const STORE = new Store();
+let STORE: Store | undefined;
 
-export const getGlobalStore = STORE;
+/**
+ * Get or create the singleton global store. Parameters only take effect during initial creation.
+ * @param initial Optional initial value
+ * @param flags Optional flags { nextTick?: boolean; strictness?: Strictness;}. Custom strictness to be used with custom comparer.
+ * @param comparer Optional supplemental comparer function to use with custom strictness flag.
+ * @returns The global Store
+ */
+export const getGlobalStore = (
+    initial?: {[prop: string]: any },
+    flags?: IStoreFlags<strictnessType>,
+    comparer?: <Stricktness extends string = strictnessType>(obj1: any, obj2: any, strictness: Stricktness) => boolean) => {
 
-export const PageStoreContext = React.createContext<Store>(new Store());
+    STORE = STORE || new Store(initial, flags, comparer);
+    return STORE;
 
-export const useGlobalStore = () => STORE;
+}

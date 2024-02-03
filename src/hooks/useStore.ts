@@ -1,7 +1,26 @@
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Observable, of, skip as _skip, switchMap, tap } from "rxjs";
 import { useObservable } from "./useObservable";
 import { Store, IStoreFlags, strictnessType } from "@tokololo/json-ptr-store";
+import { getGlobalStore } from "../store";
+
+/**
+ * Hook to retrieve the singleton global store. Parameters only take effect during initial creation.
+ * @param initial Optional initial value
+ * @param flags Optional flags { nextTick?: boolean; strictness?: Strictness;}. Custom strictness to be used with custom comparer.
+ * @param comparer Optional supplemental comparer function to use with custom strictness flag.
+ * @returns The singleton global store
+ */
+export const useGlobalStore = (
+    initial?: {[prop: string]: any },
+    flags?: IStoreFlags<strictnessType>,
+    comparer?: <Stricktness extends string = strictnessType>(obj1: any, obj2: any, strictness: Stricktness) => boolean
+) => getGlobalStore(initial, flags, comparer);
+
+/**
+ * Section store context to use on pages etc.
+ */
+export const SectionStoreContext = React.createContext<Store>(new Store());
 
 /**
  * Hook to create a store
