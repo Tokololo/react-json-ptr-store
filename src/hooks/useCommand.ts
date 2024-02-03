@@ -7,8 +7,8 @@ export const useSendCommand = (store?: Store) => {
 
     const _store = React.useMemo(() => store || getGlobalStore(), [store]);
 
-    return (ptr: string, value?: any) =>
-        _store.set([{ ptr: `/command${ptr}`, value: { value } }]);
+    return (ptr: string, value?: any) => 
+        _store.set([{ ptr: `/command${ptr}`, value: { value } }]);        
 
 }
 
@@ -25,7 +25,7 @@ export const useTriggerCommand = <T>(
         `/command${ptr}`,
         _store,
         res => {
-            if (res) {
+            if (res) {                
                 cb(res.value);
                 _store.del([`/command${ptr}`], { nextTick: true });
             }

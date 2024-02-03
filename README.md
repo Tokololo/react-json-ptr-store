@@ -185,7 +185,5 @@ useSendCommand return a function with parameters as follows:
 ## Observables
 The store works with observables so you can combine, tranform, slice and dice as you requirements demand to great compexity not shown here.
 
-
-
-
-
+## Strict mode
+If any store function gives issues please disable strict mode during development.
