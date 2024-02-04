@@ -1,6 +1,6 @@
 {
     "name": "@tokololo/react-json-ptr-store",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "A json pointer and rxjs enabled reactive store for React",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
@@ -55,13 +55,11 @@
         "jest": "^29.7.0",
         "jest-canvas-mock": "^2.5.2",
         "jest-environment-jsdom": "^29.7.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
         "ts-jest": "^29.1.2",
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@tokololo/json-ptr-store": "^1.0.13",
+        "@tokololo/json-ptr-store": "^1.0.14",
         "lodash": "^4.17.21",
         "rxjs": "^7.8.1"
     }

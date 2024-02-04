@@ -1,8 +1,8 @@
 import React from "react";
 import { Observable, of, skip as _skip, switchMap, tap } from "rxjs";
 import { useObservable } from "./useObservable";
-import { Store } from "@tokololo/json-ptr-store";
-import { IStoreFlags, getGlobalStore, strictnessType } from "../store";
+import { IStoreFlags, Store, strictnessType } from "@tokololo/json-ptr-store";
+import { getGlobalStore } from "../store";
 
 /**
  * Hook to retrieve the singleton global store. Parameters only take effect during initial creation.
