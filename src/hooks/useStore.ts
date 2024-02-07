@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Observable, of, skip as _skip, switchMap, tap } from "rxjs";
 import { useObservable } from "./useObservable";
-import { IStoreFlags, Store, strictnessType } from "@tokololo/json-ptr-store";
+import { IStoreFlags, IStorePtr, Store, strictnessType } from "@tokololo/json-ptr-store";
 import { getGlobalStore } from "../store";
 
 /**
@@ -26,15 +26,16 @@ export const SectionStoreContext = React.createContext<Store>(new Store());
  * Hook to create a store
  * @param initial 
  * @param flags 
- * @param deps 
- * @returns 
+ * @param comparer Optional supplemental comparer function to use with custom strictness flag.
+ * @returns The created store
  */
 export const useStore = (
     initial?: { [prop: string]: any },
-    flags?: IStoreFlags
+    flags?: IStoreFlags,
+    comparer?: <Stricktness extends string = strictnessType>(obj1: any, obj2: any, strictness: Stricktness) => boolean
 ) => {
 
-    const store = React.useMemo(() => new Store(initial, flags), []);
+    const store = React.useMemo(() => new Store(initial, flags, comparer), []);
 
     React.useEffect(() => {
         return () => store?.destroy();
@@ -46,27 +47,28 @@ export const useStore = (
 
 /**
  * Hook that subscribes to the store at a json pointer value
- * @param ptr 
- * @param store 
- * @param defaultValue 
- * @param initialValue 
- * @param strictness 
- * @returns 
+ * @param ptr The json ptr into the store state
+ * @param store The store to use. If undefined defaults to the global store
+ * @param defaultValue The default value to set the value to
+ * @param initialValue The initial value to return on the first render
+ * @param strictness The strictness compare type
+ * @returns The value at the json ptr
  */
 export const useStoreGet = <T = any>(
     ptr: string,
-    store: Store,
+    store?: Store,
     defaultValue?: T,
     initialValue?: T,
     strictness: strictnessType = 'none'): T | undefined => {
 
+    const _store = useMemo(() => store || getGlobalStore(), [store]);
     const [val] = useObservable<T>(() =>
         typeof defaultValue !== 'undefined' ?
             of(defaultValue).pipe(
-                tap(value => store.set([{ ptr, value }], { nextTick: false })),
-                switchMap(() => store.get(ptr, strictness))
+                tap(value => _store.set([{ ptr, value }], { nextTick: false })),
+                switchMap(() => _store.get(ptr, strictness))
             ) :
-            store.get(ptr, strictness), [ptr, store], initialValue);
+            _store.get(ptr, strictness), [ptr, store, strictness], initialValue);
 
     return val;
 
@@ -74,32 +76,33 @@ export const useStoreGet = <T = any>(
 
 /**
  * Hook to transform a json pointer store subscription
- * @param ptr 
- * @param store 
- * @param observable 
- * @param observableDeps 
- * @param defaultValue 
- * @param initialValue 
- * @param strictness 
- * @returns 
+ * @param ptr The json ptr into the store state
+ * @param observable The observable to transform
+ * @param store The store to use. If undefined defaults to the global store
+ * @param defaultValue The default value to set the value to
+ * @param initialValue The initial value to return on the first render
+ * @param strictness The strictness compare type
+ * @param deps The dependency list to guard the observable
+ * @returns The value at the json ptr transformed
  */
 export const useStoreTransform = <IN = any, OUT = any>(
     ptr: string,
-    store: Store,
     observable: (observable: Observable<IN | undefined>) => Observable<OUT | undefined>,
-    observableDeps: React.DependencyList = [],
+    store?: Store,        
     defaultValue?: IN,
     initialValue?: OUT,
-    strictness: strictnessType = 'none'): OUT | undefined => {
+    strictness: strictnessType = 'none',
+    deps: React.DependencyList = []): OUT | undefined => {
 
+    const _store = useMemo(() => store || getGlobalStore(), [store]);
     const [val] = useObservable<OUT | undefined>(() =>
         observable(
             typeof defaultValue !== 'undefined' ?
                 of(defaultValue).pipe(
-                    tap(value => store.set([{ ptr, value }], { nextTick: false })),
-                    switchMap(() => store.get<IN>(ptr, strictness))
+                    tap(value => _store.set([{ ptr, value }], { nextTick: false })),
+                    switchMap(() => _store.get<IN>(ptr, strictness))
                 ) :
-                store.get<IN>(ptr, strictness)), [ptr, store, ...observableDeps], initialValue);
+                _store.get<IN>(ptr, strictness)), [ptr, store, strictness, ...deps], initialValue);
 
     return val;
 
@@ -107,42 +110,47 @@ export const useStoreTransform = <IN = any, OUT = any>(
 
 /**
  * Hook to set a store value
- * @param store 
- * @param data 
- * @param deps 
+ * @param data The IStorePtr array to set
+ * @param store The store to use. If undefined defaults to the global store
+ * @param deps The dependency list to guard the data array
  */
-export const useStoreSet = (store: Store, data: { ptr: string, value: any }[], deps: React.DependencyList = []) => {
+export const useStoreSet = (
+    data: IStorePtr[], 
+    store?: Store, 
+    deps: React.DependencyList = []) => {
 
     React.useEffect(() => {
-        store.set(data);
-    }, [...deps]);
+        const _store = store || getGlobalStore();
+        _store.set(data);
+    }, [store, ...deps]);
 
 }
 
 /**
  * Hook to call a callback when a value at a json pointer changes
- * @param ptr 
- * @param store 
- * @param cb 
- * @param strictness 
- * @param _skip 
- * @param deps 
+ * @param ptr The ptr into the store state
+ * @param cb The callback function to run
+ * @param store The store to use. If undefined defaults to the global store
+ * @param strictness The strictness compare type
+ * @param skip The total number of initial tiggers to skip. Defaults to 1.
+ * @param deps The dependency list to guard the callback
  */
 export const useStoreTrigger = <T>(
     ptr: string,
-    store: Store,
     cb: (value: T | undefined) => void,
+    store?: Store,    
     strictness: strictnessType = 'none',
     skip: number = 1,
     deps: React.DependencyList | undefined = []): void => {
 
     React.useEffect(() => {
 
-        const sub = store.get(ptr, strictness)
+        const _store = store || getGlobalStore();
+        const sub = _store.get(ptr, strictness)
             .pipe(_skip(skip)).subscribe(cb);
 
         return () => sub.unsubscribe();
 
-    }, [ptr, ...deps]);
+    }, [ptr, store, strictness, skip, ...deps]);
 
 }
