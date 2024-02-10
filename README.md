@@ -1,8 +1,7 @@
 
 # What is react-json-ptr-store?
-React-json-ptr-store is a reactive store/state that uses json-ptr-store  to manage state. State is set and retrieved via json-pointers.
+React-json-ptr-store is a reactive store/state that uses json-ptr-store  to manage state. State is set and retrieved via json pointers.
 > Please look at documentation for [json-ptr-store](https://www.npmjs.com/package/@tokololo/json-ptr-store).
-> This is the engine that powers [react-json-ptr-form](https://www.npmjs.com/package/@tokololo/react-json-ptr-form).
 # How to use
 ## Creating a store
 There are two types of stores you can create.
@@ -124,6 +123,18 @@ Parameters are as follows:
 
 If you do not provide a value for the store it defaults to the global store. Note the second parameter which is a callback that you can use to run side-effects.
 Use the deps dependency list to manage dependencies inside the callback.
+## Complex subscription
+You can also directly retrieve an observable into the store. 
+
+    const obs = store.get<User>('/users/534');
+You need to manually subscribe to the observable and you can clean up after the observable when you are done, though the store will eventually clean up after itself should it go out of scope.
+In addition, if you use the preferred method of subscribing to the observable via `useObservable` it will be taken care of automatically and timeously.
+
+You can then use them as you would any observable, ie.:
+
+    const [value] = useObservable<COLOR>(
+      () => useStoreGet$(`/users/${id}`, store).pipe(switchMap(user => useStoreGet$(`/colors/${user.color}`, store)))
+    ), [id]);
 
 ## Side-effects
 Side-effects are performed:
@@ -154,6 +165,10 @@ Parameters are as follows:
  - defaultValue:  T  |  undefined  =  undefined
 
 useObservable can be used with store.get() directly and also with other observables, promises and dom event code. It is the ideal mechanism for fetch.
+
+    const userPrefs = useObservable(() => 
+      defer(() => from(fetch(`http://myserver.com/userPrefs/${id}`))), 
+    [id]);   
 
 Inside commands
 
@@ -205,8 +220,3 @@ useSendCommand returns a function that you call with parameters as follows:
 
 ## Observables
 The store works with observables so you can combine, tranform, slice and dice as you requirements demand to great compexity not shown here.
-
-
-
-
-
