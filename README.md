@@ -42,7 +42,7 @@ Code within your SectionStoreContext tree can then access the store as follows:
 
     const store = useContext(SectionStoreContext);
 ## Set values
-You set values in your store in three ways:
+You set values in your store in four ways:
 
 **Firstly** during store creation.
 
@@ -52,7 +52,7 @@ You set values in your store in three ways:
       store.set([{ptr: '/pages/home/title', value: 'My Title'}]);
     }
 
-**Lastly** inside your React  rendering code as follows: 
+**Thirdly** inside your React  rendering code as follows: 
 
     useStoreSet([{ptr: '/pages/home/title', value: 'My Title'}], store); 
 Parameters are as follows:
@@ -62,6 +62,8 @@ Parameters are as follows:
  - deps:  React.DependencyList  = []
 
 If you do not provide a store for the second parameter it defaults to the global store. The third parameter is a dependency array that you need to manage should you wish to change the data array.
+
+**Lastly** when subscribing via a get you have the eoption of setting a default value.
 ## Slice values
 You slice values inside hooks and callback code as follows:
 
@@ -85,14 +87,47 @@ Parameters are as follows:
  - strictness:  strictnessType  =  'none'
  
 If you do not provide a store for the second parameter it defaults to the global store. Use defaultValue to initialise the value at that ptr. Use initialValue to return that value during the first render.
+
+A typical use case for setting initialValue is for lists, ie:
+
+    const myList = useStoreGet<string[]>(
+	    '/data/myList', 
+	    store,
+	    undefined, // No defaultValue as there is already data
+	    []);       // Set to an empty array for first render
+
+A typical use case for setting defaultValue involves setting initialValue to the same as in:
+
+    const items: string[] = ["Your free coupon"];
+    const myAddedItems = useStoreGet<string[]>(
+	    '/data/myAddedItems', 
+	    store,
+	    items,  // will take effect on next render
+	    items); // return on first render
+If you cannot set a default and want the actual value on the first render you can always set the initialValue to a slice at that ptr:
+
+    const myList = useStoreGet<string[]>(
+        '/data/myList', 
+        store,
+        undefined,
+        store.slice<string[]>('/data/myList'));
+
 ## Subscribe and transform values
 You can transform values as you subscribe to them:
 
     const title = useStoreTransform<string, string>(
         '/pages/home/title',         
-        o => o.pipe(map(title => title.toLocalUppercase())),
+        o => o.pipe(map(title => title.toLocaleUppercase())),
         store);
+You can also filter:
 
+     const showAlert = useStoreTransform<LedgerLines[], string>(
+         '/ledger/lines',         
+          o => o.pipe(filter(lines => {
+              const total = lines.reduce((acc, cur) => acc + cur.total, 0);
+              return total > MAX_ALLOWED;
+          })
+     ), store);
 Parameters are as follows:
 
  - ptr:  string,   
@@ -105,6 +140,8 @@ Parameters are as follows:
 
 If you do not provide a value for the store it defaults to the global store. Note the second parameter which is an observable that you can pipe to tranform, or even tap for side-effects.
 Use the deps dependency list to manage dependencies inside the observable.
+
+
 ## Trigger callback code
 You can subscribe to values and trigger callback code:
 
@@ -141,14 +178,14 @@ You can then use them as you would any observable, ie.:
 ## Commands
 The store provides an simple yet effective commands interface. Commands are handy when you need to send the same values and be notified every time and to run side-effects. 
 
-useStoreGet will update values depending on the strictness you implement and it will always provide a new reference for arrays and object literals to React so as to ensure re-rendering takes place. Under the hood that is provided by useObservable. For simple values like numbers and strings that is not the case and will not be a problem for re-rendering as your intention would be not to re-render if a simple value stays the same. 
+useStoreGet will update values depending on the strictness you implement and it will always provide a new reference for arrays and object literals to React so as to ensure re-rendering takes place. Under the hood that is provided by useObservable. For scalar values like numbers and strings that is not the case and will not be a problem for re-rendering as your intention would be not to re-render if a scalar value stays the same. 
 
-Command on the other hand will trigger for every command that it receives, even if its simple value it passes is the same. It is used as follows:
+Command on the other hand will trigger for every command that it receives, even if its scalar value it passes is the same. It is used as follows:
 
-    useTriggerCommand(
-       `/submitted_user/${props.id}`, 
-       _ => setBlurred(),
-    [setBlurred]);
+    useTriggerCommand<User>(
+       '/submitted_user', 
+       user => addToList(user),
+    [addToList]);
 
 Parameters are as follows:
 
@@ -162,8 +199,8 @@ Use the deps dependency list to manage dependencies inside the callback.
 ###
 
     const sendCommand = useSendCommand();
-    const onClicked = (id: string, data: IUserData) => {
-       sendCommand(`/users/${id}`, data);
+    const onSubmitted = (user: User) => {
+       sendCommand('/submitted_user', user);
     }
 Parameters are as follows for useSendCommand:
 
