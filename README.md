@@ -63,7 +63,7 @@ Parameters are as follows:
 
 If you do not provide a store for the second parameter it defaults to the global store. The third parameter is a dependency array that you need to manage should you wish to change the data array.
 
-**Lastly** when subscribing via a get you have the eoption of setting a default value.
+**Lastly** when subscribing via a get you have the option of setting a default value.
 ## Slice values
 You slice values inside hooks and callback code as follows:
 
@@ -121,12 +121,13 @@ You can transform values as you subscribe to them:
         store);
 You can also filter:
 
-     const showAlert = useStoreTransform<LedgerLines[], string>(
+     const showAlert = useStoreTransform<LedgerLines[], boolean>(
          '/ledger/lines',         
-          o => o.pipe(filter(lines => {
-              const total = lines.reduce((acc, cur) => acc + cur.total, 0);
-              return total > MAX_ALLOWED;
-          })
+          o => o.pipe(
+              map(lines => lines.reduce((acc, cur) => acc + cur.total, 0)),
+              filter(total => total > MAX_ALLOWED),
+              map(total => true)
+          )
      ), store);
 Parameters are as follows:
 
