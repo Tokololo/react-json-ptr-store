@@ -150,7 +150,7 @@ You can subscribe to values and trigger callback code:
     useStoreTrigger(
       '/pages/home/title',        
       (value) => {
-      ...
+          document.title = value;
       },
       store);
 Parameters are as follows:
