@@ -125,6 +125,7 @@ You can also filter:
          '/ledger/lines',         
           o => o.pipe(
               map(lines => lines.reduce((acc, cur) => acc + cur.total, 0)),
+              tap(total => store.set([{ptr: '/ledger/total', value: total }])),
               filter(total => total > MAX_ALLOWED),
               map(total => true)
           )
