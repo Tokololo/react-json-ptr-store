@@ -285,3 +285,6 @@ useObservable can be used with store.get() directly and also with other observab
 
 ## Observables
 The store works with observables so you can combine, tranform, slice and dice as you requirements demand to great compexity not shown here.
+# Change Log
+## version 2.0.3
+ - Update json-ptr-store to version 1.1.5 which removed undefined set limitation
