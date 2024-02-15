@@ -1,9 +1,9 @@
 
 # What is react-json-ptr-store?
 React-json-ptr-store is a [rxjs](https://www.npmjs.com/package/rxjs) reactive store that uses [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme) to manage state. State is set and retrieved via [json pointers](https://datatracker.ietf.org/doc/html/rfc6901).
-> Please look at documentation for [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme).
-> For the latest documentation please consult the repo  [readme](https://github.com/Tokololo/react-json-ptr-store#readme)
-> If you like react-json-ptr-store also have a look at [react-json-ptr-form](https://github.com/Tokololo/react-json-ptr-form#readme)
+> Please look at documentation for [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme).  
+> For the latest documentation please consult the repo  [readme](https://github.com/Tokololo/react-json-ptr-store#readme).  
+> If you like react-json-ptr-store also have a look at [react-json-ptr-form](https://github.com/Tokololo/react-json-ptr-form#readme).
 # How to use
 ## Create a store
 There are two types of stores you can create.
@@ -260,11 +260,21 @@ Parameters are as follows:
  - deps:  DependencyList,
  - defaultValue:  T  |  undefined  =  undefined
 
-useObservable can be used with store.get() directly and also with other observables, promises and dom event code. It is the ideal mechanism for fetch.
+useObservable takes an observable generator function as its first parameter. This is just a function that returns an observable. Each time the deps dependency list changes the generator function is rerun so as to generate a new observable that has the new dependencies in scope.
+
+useObservable can be used with store.get() directly and also with other observables, promises and dom event code.
 
     const userPrefs = useObservable(() => 
       defer(() => from(fetch(`http://myserver.com/userPrefs/${id}`))), 
-    [id]);   
+    [id]);  // when id changes the observable will run again   
+
+    const total = useObservable(() => combineLatest([  
+        store.get<number>('/total1'),  
+        store.get<number>('/total2')  
+      ]).pipe(  
+        map(([total1, total2]) => total1 + total2)
+      ),  
+    []);
 
 ### inside Commands
 
