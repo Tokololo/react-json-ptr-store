@@ -1,6 +1,6 @@
 
 # What is react-json-ptr-store?
-React-json-ptr-store is a [rxjs](https://www.npmjs.com/package/rxjs) reactive store that uses [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme) to manage state. State is set and retrieved via [json pointers](https://datatracker.ietf.org/doc/html/rfc6901).
+React-json-ptr-store is a [rxjs](https://www.npmjs.com/package/rxjs) reactive store that uses [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme) to manage state. State is set and retrieved via [json pointers](https://datatracker.ietf.org/doc/html/rfc6901). It is intuitive, minimalist yet powerful.
 > Please look at documentation for [json-ptr-store](https://github.com/Tokololo/json-ptr-store#readme).  
 > For the latest documentation please consult the repo  [readme](https://github.com/Tokololo/react-json-ptr-store#readme).  
 > If you like react-json-ptr-store also have a look at [react-json-ptr-form](https://github.com/Tokololo/react-json-ptr-form#readme).
@@ -176,7 +176,9 @@ In addition, if you use the preferred method of subscribing to the observable vi
 You can then use them as you would any observable, ie.:
 
     const [value] = useObservable<COLOR>(
-      () => useStoreGet$(`/users/${id}`, store).pipe(switchMap(user => useStoreGet$(`/colors/${user.color}`, store)))
+      () => useStoreGet$(`/users/${id}`, store).pipe(
+        switchMap(user => useStoreGet$(`/colors/${user.color}`, store))
+      )
     ), [id]);
 
 ## Commands
@@ -252,7 +254,8 @@ Side-effects are performed:
 
     const [data] = useObservable(() => 
       userDataObservable(session_uid)
-        .pipe(tap(user => console.log('run effect here'))), [session_uid]);
+        .pipe(tap(user => console.log('run effect here'))), 
+      [session_uid]);
 
 Parameters are as follows:
 
