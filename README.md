@@ -176,9 +176,9 @@ In addition, if you use the preferred method of subscribing to the observable vi
 
 You can then use them as you would any observable, ie.:
 
-    const [value] = useObservable<COLOR>(
-      () => useStoreGet$(`/users/${id}`, store).pipe(
-        switchMap(user => useStoreGet$(`/colors/${user.color}`, store))
+    const [userColor] = useObservable<COLOR>(
+      () => store.get(`/users/${id}`).pipe(
+        switchMap(user => store.get(`/colors/${user.color}`))
       )
     ), [id]);
 
