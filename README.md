@@ -36,8 +36,9 @@ Parameters are as follows:
 
 It is to be used with Context as follows:
 
+    const store = useStore();
     <SectionStoreContext.Provider value={store}>
-    ...
+      ...
     </SectionStoreContext.Provider>;
 
 Code within your SectionStoreContext tree can then access the store as follows:
@@ -121,7 +122,7 @@ You can transform values as you subscribe to them:
         '/pages/home/title',         
         o => o.pipe(map(title => title.toLocaleUppercase())),
         store);
-You can also filter:
+You can also filter and run side-effects via tap:
 
      const showAlert = useStoreTransform<LedgerLines[], boolean>(
          '/ledger/lines',         
