@@ -88,7 +88,7 @@ export const useStoreGet = <T = any>(
 export const useStoreTransform = <IN = any, OUT = any>(
     ptr: string,
     observable: (observable: Observable<IN | undefined>) => Observable<OUT | undefined>,
-    store?: Store,        
+    store?: Store,
     defaultValue?: IN,
     initialValue?: OUT,
     strictness: strictnessType = 'none',
@@ -113,15 +113,22 @@ export const useStoreTransform = <IN = any, OUT = any>(
  * @param data The IStorePtr array to set
  * @param store The store to use. If undefined defaults to the global store
  * @param deps The dependency list to guard the data array
+ * @param delUnmount Delete the set pointers on unmount. @TODO move above deps on major version update.
  */
 export const useStoreSet = (
-    data: IStorePtr[], 
-    store?: Store, 
-    deps: React.DependencyList = []) => {
+    data: IStorePtr[],
+    store?: Store,
+    deps: React.DependencyList = [],
+    delUnmount?: boolean) => {
 
     React.useEffect(() => {
+        const ptrs = data.map(d => d.ptr);
         const _store = store || getGlobalStore();
         _store.set(data);
+        return () => {
+            if (delUnmount)
+                _store.del(ptrs);
+        }
     }, [store, ...deps]);
 
 }
@@ -138,7 +145,7 @@ export const useStoreSet = (
 export const useStoreTrigger = <T>(
     ptr: string,
     cb: (value: T | undefined) => void,
-    store?: Store,    
+    store?: Store,
     strictness: strictnessType = 'none',
     skip: number = 1,
     deps: React.DependencyList | undefined = []): void => {

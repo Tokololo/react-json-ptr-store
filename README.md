@@ -8,7 +8,9 @@ React-json-ptr-store is a [rxjs](https://www.npmjs.com/package/rxjs) reactive st
 ## Create a store
 There are two types of stores you can create.
 
- The **first** is the global singleton store that is available application-wide. You can create/access it in three ways:
+The **first** is the global singleton store that is available application-wide. 
+
+You can create/access it in three ways:
 
     const store = getGlobalStore();
     const store = useGlobalStore();
@@ -61,10 +63,11 @@ You set values in your store in four ways:
 Parameters are as follows:
 
  - data: { ptr:  string, value:  any }[],  
- - store?:  Store,  
- - deps:  React.DependencyList  = []
+ - store?: Store,  
+ - deps: React.DependencyList = [],
+ - delUnmount?: boolean
 
-If you do not provide a store for the second parameter it defaults to the global store. The third parameter is a dependency array that you need to manage should you wish to change the data array.
+If you do not provide a store for the second parameter it defaults to the global store. The third parameter is a dependency array that you need to manage should you wish to change the data array. Set delUnmount when you want to delete the values that was set when the component unmounts. This is useful if you want to use a store area only for the duration of the life of a component.
 
 **Lastly** when subscribing via a get you have the option of setting a default value.
 ## Slice values
@@ -227,7 +230,7 @@ Side-effects are performed:
 ### in hooks and callback code
 
     useEffect(() => {
-       store.set('/pages/home/title', 'My Title');
+      store.set('/pages/home/title', 'My Title');
     }, []);
 
 ### in useStoreTransform observable using tap, switchMap etc.
@@ -255,40 +258,43 @@ Side-effects are performed:
 
     const [data] = useObservable(() => 
       userDataObservable(session_uid)
-        .pipe(tap(user => console.log('run effect here'))), 
-      [session_uid]);
+        .pipe(
+          tap(user => console.log('run effect here'))
+        ), [session_uid]);
 
 Parameters are as follows:
 
- - observableGenerator: () =>  Observable<T>,
- - deps:  DependencyList,
- - defaultValue:  T  |  undefined  =  undefined
+ - observableGenerator: () => Observable<T>,
+ - deps: DependencyList,
+ - defaultValue: T | undefined = undefined
 
 useObservable takes an observable generator function as its first parameter. This is just a function that returns an observable. Each time the deps dependency list changes the generator function is rerun so as to generate a new observable that has the new dependencies in scope.
 
 useObservable can be used with store.get() directly and also with other observables, promises and dom event code.
 
     const userPrefs = useObservable(() => 
-      defer(() => from(fetch(`http://myserver.com/userPrefs/${id}`))), 
-    [id]);  // when id changes the observable will run again   
+      defer(() => from(fetch(`http://myserver.com/userPrefs/${id}`))
+    ), [id]);  // when id changes the observable will recreate   
 
-    const total = useObservable(() => combineLatest([  
+    const total = useObservable(() => 
+      combineLatest([  
         store.get<number>('/total1'),  
         store.get<number>('/total2')  
       ]).pipe(  
         map(([total1, total2]) => total1 + total2)
-      ),  
-    []);
+      ), []);
 
 ### inside Commands
 
     useTriggerCommand(
-       `/submitted_user/${props.id}`, 
-       _ => setBlurred(),
+      `/submitted_user/${props.id}`, 
+      _ => setBlurred(),
     [props.id, setBlurred]);
 
 ## Observables
 The store works with observables so you can combine, tranform, slice and dice as you requirements demand to great compexity not shown here.
 # Change Log
+## version 2.0.4
+ - Add delUnmount parameter to useStoreSet to enable cleaning up after the set values on component unmount
 ## version 2.0.3
  - Update json-ptr-store to version 1.1.5 which removed undefined set limitation
