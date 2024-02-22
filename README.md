@@ -294,6 +294,8 @@ useObservable can be used with store.get() directly and also with other observab
 ## Observables
 The store works with observables so you can combine, tranform, slice and dice as you requirements demand to great compexity not shown here.
 # Change Log
+## version 2.0.5
+ - Fixed a bug where in certain rare occurences useObservable does not provide a new reference
 ## version 2.0.4
  - Add delUnmount parameter to useStoreSet to enable cleaning up after the set values on component unmount
 ## version 2.0.3

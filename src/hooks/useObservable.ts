@@ -30,7 +30,7 @@ export const useObservable = <T>(
 
         const sub = cb().subscribe({
             next: (data: T) => {
-                setValue((v) => v === data ? newRef(data) : data);
+                setValue(newRef(data));
                 setError(undefined);
             },
             error: (err: any) => {
